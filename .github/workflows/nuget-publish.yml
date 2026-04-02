@@ -1,0 +1,63 @@
+name: NuGet Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-publish:
+    name: Build & Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE=true" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=0.0.0-dev" >> $GITHUB_OUTPUT
+            echo "IS_RELEASE=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Pack
+        run: dotnet pack src/HubMon.Client/HubMon.Client.csproj --configuration Release --no-build -o ./nupkg -p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Publish to GitHub Packages
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/gethubmon/index.json" --api-key ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to NuGet.org
+        if: steps.version.outputs.IS_RELEASE == 'true' && secrets.NUGET_API_KEY != ''
+        run: dotnet nuget push ./nupkg/*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        run: gh release create ${{ github.ref_name }} ./nupkg/*.nupkg --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

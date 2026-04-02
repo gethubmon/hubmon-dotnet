@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/HubMon.Sample.WebApi/HubMon.Sample.WebApi.csproj" />
+    <Project Path="samples/HubMon.Sample.WorkerService/HubMon.Sample.WorkerService.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/HubMon.Client/HubMon.Client.csproj" />
+  </Folder>
+</Solution>
