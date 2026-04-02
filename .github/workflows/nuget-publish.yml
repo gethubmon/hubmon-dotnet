@@ -51,10 +51,8 @@ jobs:
         run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/gethubmon/index.json" --api-key ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NuGet.org
-        if: steps.version.outputs.IS_RELEASE == 'true' && secrets.NUGET_API_KEY != ''
+        if: steps.version.outputs.IS_RELEASE == 'true'
         run: dotnet nuget push ./nupkg/*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }}
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
       - name: Create GitHub Release
         if: steps.version.outputs.IS_RELEASE == 'true'
