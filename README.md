@@ -1,6 +1,12 @@
 # HubMon.Client
 
+[![NuGet](https://img.shields.io/nuget/v/HubMon.Client.svg)](https://www.nuget.org/packages/HubMon.Client)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/HubMon.Client.svg)](https://www.nuget.org/packages/HubMon.Client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Official .NET client SDK for the [HubMon](https://hubmon.com) service monitoring platform. Automatically registers your service and sends periodic heartbeats with system metrics.
+
+> **Current version:** `1.0.0-alpha.1` — [View on NuGet](https://www.nuget.org/packages/HubMon.Client)
 
 ## Features
 
@@ -14,8 +20,10 @@ Official .NET client SDK for the [HubMon](https://hubmon.com) service monitoring
 ## Installation
 
 ```bash
-dotnet add package HubMon.Client
+dotnet add package HubMon.Client --prerelease
 ```
+
+> For stable releases: `dotnet add package HubMon.Client`
 
 ## Quick Start
 

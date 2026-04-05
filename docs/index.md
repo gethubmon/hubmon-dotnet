@@ -10,7 +10,10 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: View on GitHub
+      text: NuGet Package
+      link: https://www.nuget.org/packages/HubMon.Client
+    - theme: alt
+      text: GitHub
       link: https://github.com/gethubmon/hubmon-dotnet
 
 features:

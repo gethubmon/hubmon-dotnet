@@ -46,7 +46,8 @@ Official .NET client SDK for HubMon service monitoring platform.
 
 ## Versioning
 - Tag-based: `v1.0.0-alpha.1` for prerelease, `v1.0.0` for stable
-- Current: `v1.0.0-alpha.1`
+- Current published: `v1.0.0-alpha.1` (NuGet)
+- Next milestone: `v1.0.0` stable release
 
 ## Commands
 ```bash
