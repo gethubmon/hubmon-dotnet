@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-06
+
+### Added
+- Server-driven config: heartbeat interval, enabled metrics, and request tracking are now controlled by the server based on account tier
+- `ServerConfig` singleton for sharing server-provided settings between registrar and heartbeat service
+- Per-metric filtering: each metric (cpu, memory, disk, threads, rpm, connections) can be individually enabled/disabled by the server
+
+### Changed
+- Client-configured `HeartbeatInterval`, `EnableMetrics`, and `EnableRequestTracking` now serve as fallbacks — server values take priority
+
 ## [1.1.0] - 2026-04-06
 
 ### Changed

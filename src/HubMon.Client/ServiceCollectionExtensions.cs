@@ -25,6 +25,9 @@ public static class ServiceCollectionExtensions
         // Register options
         services.Configure(configure);
 
+        // Register server config singleton (shared between registrar and heartbeat)
+        services.AddSingleton<ServerConfig>();
+
         // Register HttpClient for registrar
         services.AddHttpClient<IServiceMonitorRegistrar, ServiceMonitorRegistrar>();
 

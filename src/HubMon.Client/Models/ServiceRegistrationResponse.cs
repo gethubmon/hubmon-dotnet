@@ -8,4 +8,9 @@ internal class ServiceRegistrationResponse
     public string Environment { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+
+    // Server-driven config (tier-based)
+    public int? HeartbeatInterval { get; set; }
+    public string[]? EnabledMetrics { get; set; }
+    public bool? EnableRequestTracking { get; set; }
 }

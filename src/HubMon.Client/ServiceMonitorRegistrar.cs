@@ -12,6 +12,7 @@ internal class ServiceMonitorRegistrar : IServiceMonitorRegistrar
     private readonly ServiceMonitorOptions _options;
     private readonly ILogger<ServiceMonitorRegistrar> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ServerConfig _serverConfig;
     private Guid? _instanceId;
 
     public Guid? InstanceId => _instanceId;
@@ -20,12 +21,14 @@ internal class ServiceMonitorRegistrar : IServiceMonitorRegistrar
         HttpClient httpClient,
         IOptions<ServiceMonitorOptions> options,
         ILogger<ServiceMonitorRegistrar> logger,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        ServerConfig serverConfig)
     {
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _serverConfig = serverConfig;
 
         // Configure HttpClient
         _httpClient.BaseAddress = new Uri(_options.DashboardUrl);
@@ -126,12 +129,22 @@ internal class ServiceMonitorRegistrar : IServiceMonitorRegistrar
 
             _instanceId = result.InstanceId;
 
+            // Apply server-driven config
+            _serverConfig.HeartbeatIntervalSeconds = result.HeartbeatInterval;
+            _serverConfig.EnabledMetrics = result.EnabledMetrics;
+            _serverConfig.EnableRequestTracking = result.EnableRequestTracking;
+
             if (_options.EnableLogging)
             {
+                var effectiveInterval = _serverConfig.GetEffectiveHeartbeatInterval(_options.HeartbeatInterval);
                 _logger.LogInformation(
-                    "Successfully registered service {ServiceName}. Instance ID: {InstanceId}",
+                    "Successfully registered service {ServiceName}. Instance ID: {InstanceId}. " +
+                    "Server config — heartbeat: {Interval}s, metrics: [{Metrics}], requestTracking: {RequestTracking}",
                     _options.ServiceName,
-                    _instanceId);
+                    _instanceId,
+                    effectiveInterval.TotalSeconds,
+                    result.EnabledMetrics != null ? string.Join(", ", result.EnabledMetrics) : "fallback",
+                    result.EnableRequestTracking?.ToString() ?? "fallback");
             }
 
             return _instanceId.Value;

@@ -14,6 +14,7 @@ internal class HeartbeatBackgroundService : BackgroundService
     private readonly HttpClient _httpClient;
     private readonly IServiceMonitorRegistrar _registrar;
     private readonly ServiceMonitorOptions _options;
+    private readonly ServerConfig _serverConfig;
     private readonly ILogger<HeartbeatBackgroundService> _logger;
     private readonly Process _currentProcess;
 
@@ -21,11 +22,13 @@ internal class HeartbeatBackgroundService : BackgroundService
         HttpClient httpClient,
         IServiceMonitorRegistrar registrar,
         IOptions<ServiceMonitorOptions> options,
+        ServerConfig serverConfig,
         ILogger<HeartbeatBackgroundService> logger)
     {
         _httpClient = httpClient;
         _registrar = registrar;
         _options = options.Value;
+        _serverConfig = serverConfig;
         _logger = logger;
         _currentProcess = Process.GetCurrentProcess();
 
@@ -48,12 +51,15 @@ internal class HeartbeatBackgroundService : BackgroundService
             return;
         }
 
+        var heartbeatInterval = _serverConfig.GetEffectiveHeartbeatInterval(_options.HeartbeatInterval);
+
         if (_options.EnableLogging)
         {
             _logger.LogInformation(
-                "Heartbeat service started for instance {InstanceId}. Interval: {Interval}",
+                "Heartbeat service started for instance {InstanceId}. Interval: {Interval}s (source: {Source})",
                 _registrar.InstanceId,
-                _options.HeartbeatInterval);
+                heartbeatInterval.TotalSeconds,
+                _serverConfig.HeartbeatIntervalSeconds.HasValue ? "server" : "client");
         }
 
         while (!stoppingToken.IsCancellationRequested)
@@ -70,7 +76,7 @@ internal class HeartbeatBackgroundService : BackgroundService
                 }
             }
 
-            await Task.Delay(_options.HeartbeatInterval, stoppingToken);
+            await Task.Delay(heartbeatInterval, stoppingToken);
         }
 
         if (_options.EnableLogging)
@@ -99,44 +105,54 @@ internal class HeartbeatBackgroundService : BackgroundService
             { "timestamp", DateTime.UtcNow }
         };
 
-        // Collect metrics if enabled
-        if (_options.EnableMetrics)
+        // Collect metrics based on server config (falls back to client config)
+        var metricsEnabled = _serverConfig.HasAnyMetrics() || _options.EnableMetrics;
+
+        if (metricsEnabled)
         {
             try
             {
                 _currentProcess.Refresh();
 
-                // CPU percentage (approximation)
-                var cpuTime = _currentProcess.TotalProcessorTime;
-                var uptime = DateTime.UtcNow - _currentProcess.StartTime.ToUniversalTime();
-                var cpuPercent = (cpuTime.TotalMilliseconds / uptime.TotalMilliseconds) * 100.0 / Environment.ProcessorCount;
+                bool ServerMetric(string key) => _serverConfig.HasAnyMetrics()
+                    ? _serverConfig.IsMetricEnabled(key)
+                    : _options.EnableMetrics;
 
-                // Memory in MB
-                var memoryMB = _currentProcess.WorkingSet64 / 1024.0 / 1024.0;
-
-                // Total available memory
-                var gcMemInfo = GC.GetGCMemoryInfo();
-                var totalMemoryMB = gcMemInfo.TotalAvailableMemoryBytes / 1024.0 / 1024.0;
-
-                // Disk usage (root drive)
-                double? diskUsagePercent = null;
-                try
+                if (ServerMetric("cpu"))
                 {
-                    var rootDrive = new DriveInfo(Path.GetPathRoot(AppContext.BaseDirectory) ?? "/");
-                    if (rootDrive.IsReady)
-                    {
-                        diskUsagePercent = Math.Round((1.0 - (double)rootDrive.AvailableFreeSpace / rootDrive.TotalSize) * 100, 2);
-                    }
+                    var cpuTime = _currentProcess.TotalProcessorTime;
+                    var uptime = DateTime.UtcNow - _currentProcess.StartTime.ToUniversalTime();
+                    var cpuPercent = (cpuTime.TotalMilliseconds / uptime.TotalMilliseconds) * 100.0 / Environment.ProcessorCount;
+                    metadata["cpu_percent"] = Math.Round(cpuPercent, 2);
                 }
-                catch { /* Disk info not available */ }
 
-                metadata["cpu_percent"] = Math.Round(cpuPercent, 2);
-                metadata["memory_mb"] = Math.Round(memoryMB, 2);
-                metadata["total_memory_mb"] = Math.Round(totalMemoryMB, 2);
-                metadata["thread_count"] = _currentProcess.Threads.Count;
+                if (ServerMetric("memory"))
+                {
+                    var memoryMB = _currentProcess.WorkingSet64 / 1024.0 / 1024.0;
+                    metadata["memory_mb"] = Math.Round(memoryMB, 2);
 
-                if (diskUsagePercent.HasValue)
-                    metadata["disk_usage_percent"] = diskUsagePercent.Value;
+                    var gcMemInfo = GC.GetGCMemoryInfo();
+                    var totalMemoryMB = gcMemInfo.TotalAvailableMemoryBytes / 1024.0 / 1024.0;
+                    metadata["total_memory_mb"] = Math.Round(totalMemoryMB, 2);
+                }
+
+                if (ServerMetric("disk"))
+                {
+                    try
+                    {
+                        var rootDrive = new DriveInfo(Path.GetPathRoot(AppContext.BaseDirectory) ?? "/");
+                        if (rootDrive.IsReady)
+                        {
+                            metadata["disk_usage_percent"] = Math.Round((1.0 - (double)rootDrive.AvailableFreeSpace / rootDrive.TotalSize) * 100, 2);
+                        }
+                    }
+                    catch { /* Disk info not available */ }
+                }
+
+                if (ServerMetric("threads"))
+                {
+                    metadata["thread_count"] = _currentProcess.Threads.Count;
+                }
             }
             catch (Exception ex)
             {
@@ -147,11 +163,16 @@ internal class HeartbeatBackgroundService : BackgroundService
             }
         }
 
-        // Request tracking metrics
-        if (_options.EnableRequestTracking)
+        // Request tracking metrics — server config overrides client config
+        var requestTrackingEnabled = _serverConfig.GetEffectiveRequestTracking(_options.EnableRequestTracking);
+
+        if (requestTrackingEnabled)
         {
-            metadata["requests_per_minute"] = RequestTracker.GetRequestsPerMinute();
-            metadata["active_connections"] = RequestTracker.GetActiveConnections();
+            if (!_serverConfig.HasAnyMetrics() || _serverConfig.IsMetricEnabled("rpm"))
+                metadata["requests_per_minute"] = RequestTracker.GetRequestsPerMinute();
+
+            if (!_serverConfig.HasAnyMetrics() || _serverConfig.IsMetricEnabled("connections"))
+                metadata["active_connections"] = RequestTracker.GetActiveConnections();
         }
 
         var request = new HeartbeatRequest

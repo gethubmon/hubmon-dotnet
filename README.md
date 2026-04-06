@@ -6,7 +6,7 @@
 
 Official .NET client SDK for the [HubMon](https://hubmon.com) service monitoring platform. Automatically registers your service and sends periodic heartbeats with system metrics.
 
-> **Current version:** `1.1.0` — [View on NuGet](https://www.nuget.org/packages/HubMon.Client)
+> **Current version:** `1.2.0` — [View on NuGet](https://www.nuget.org/packages/HubMon.Client)
 
 ## Features
 
