@@ -7,7 +7,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>HubMon.Client</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>gethubmon</Authors>
     <Company>HubMon</Company>
     <Description>Official .NET client SDK for HubMon — service monitoring platform. Auto-registers services and sends heartbeats with system metrics (CPU, memory, disk, requests/min).</Description>

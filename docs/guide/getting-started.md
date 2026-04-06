@@ -5,12 +5,8 @@
 Install the HubMon SDK via NuGet:
 
 ```bash
-dotnet add package HubMon.Client --prerelease
+dotnet add package HubMon.Client
 ```
-
-::: info
-The SDK is currently in pre-release (`1.0.0-alpha.1`). Use `--prerelease` to install the latest version. Once `1.0.0` stable is released, you can omit this flag.
-:::
 
 ## Quick Start
 
