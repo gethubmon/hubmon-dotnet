@@ -49,10 +49,10 @@ class HeartbeatRequest
 
 ## Extension Methods
 
-### `AddServiceMonitor()`
+### `AddHubMon()`
 
 ```csharp
-public static IServiceCollection AddServiceMonitor(
+public static IServiceCollection AddHubMon(
     this IServiceCollection services,
     Action<ServiceMonitorOptions> configure)
 ```

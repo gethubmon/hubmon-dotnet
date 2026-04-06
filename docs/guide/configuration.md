@@ -1,9 +1,9 @@
 # Configuration
 
-All options are set via `AddServiceMonitor()`:
+All options are set via `AddHubMon()`:
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     // Configure here
 });

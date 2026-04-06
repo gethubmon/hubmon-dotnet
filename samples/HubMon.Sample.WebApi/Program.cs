@@ -3,7 +3,7 @@ using ServiceMonitor.Client;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add HubMon monitoring
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = builder.Configuration["HubMon:DashboardUrl"] ?? "http://localhost:5192";
     options.ApiKey = builder.Configuration["HubMon:ApiKey"] ?? "sm_live_your_key_here";

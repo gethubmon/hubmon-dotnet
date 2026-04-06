@@ -5,7 +5,7 @@ Track CI/CD information with each service registration. This helps you identify 
 ## Basic Usage
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_...";
@@ -23,7 +23,7 @@ builder.Services.AddServiceMonitor(options =>
 ## Azure DevOps Integration
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_...";

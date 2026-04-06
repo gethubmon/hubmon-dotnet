@@ -14,7 +14,7 @@ Official .NET client SDK for HubMon service monitoring platform.
 - `.github/workflows/` — NuGet publish + docs deploy pipelines
 
 ## Key Files
-- `ServiceCollectionExtensions.cs` — `AddServiceMonitor()` public API
+- `ServiceCollectionExtensions.cs` — `AddHubMon()` public API
 - `ApplicationBuilderExtensions.cs` — `UseHubMonTracking()` middleware
 - `ServiceMonitorOptions.cs` — All configuration options
 - `HeartbeatBackgroundService.cs` — Periodic heartbeat + metrics collection

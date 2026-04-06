@@ -21,7 +21,7 @@ using ServiceMonitor.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_your_api_key_here";
@@ -56,7 +56,7 @@ The API key is shown only once — save it securely!
 For web applications, you can also track requests per minute and active connections:
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     // ...
     options.EnableRequestTracking = true;

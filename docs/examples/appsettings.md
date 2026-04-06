@@ -23,7 +23,7 @@ Bind configuration from `appsettings.json` instead of hardcoding values:
 ## Program.cs
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     builder.Configuration.GetSection("HubMon").Bind(options);
 });

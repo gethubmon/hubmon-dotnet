@@ -6,13 +6,13 @@ namespace ServiceMonitor.Client;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds Service Monitor client to the service collection.
-    /// This will register the service with the Service Monitor API and send periodic heartbeats.
+    /// Adds HubMon monitoring client to the service collection.
+    /// This will register the service with the HubMon API and send periodic heartbeats.
     /// </summary>
     /// <param name="services">The service collection</param>
     /// <param name="configure">Configuration action for ServiceMonitorOptions</param>
     /// <returns>The service collection for chaining</returns>
-    public static IServiceCollection AddServiceMonitor(
+    public static IServiceCollection AddHubMon(
         this IServiceCollection services,
         Action<ServiceMonitorOptions> configure)
     {

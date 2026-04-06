@@ -7,7 +7,7 @@ using ServiceMonitor.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_...";

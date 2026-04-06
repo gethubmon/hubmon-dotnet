@@ -19,7 +19,7 @@ Stable release — no changes from `1.0.0-alpha.1`.
 - Request tracking middleware: requests/min, active connections
 - Deployment metadata support (CI/CD integration)
 - Exponential backoff retry logic (configurable 0–10 attempts)
-- ASP.NET Core DI integration via `AddServiceMonitor()`
+- ASP.NET Core DI integration via `AddHubMon()`
 - Request tracking middleware via `UseHubMonTracking()`
 - Auto-detection of hostname, port, and URL
 - Multi-target support: .NET 8.0 and .NET 9.0

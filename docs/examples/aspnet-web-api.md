@@ -7,7 +7,7 @@ using ServiceMonitor.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = builder.Configuration["HubMon:DashboardUrl"]
         ?? "https://api.hubmon.com";

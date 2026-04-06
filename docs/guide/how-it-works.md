@@ -18,7 +18,7 @@ Your App starts
 
 ## Registration Flow
 
-1. Your application starts and `AddServiceMonitor()` configures the SDK
+1. Your application starts and `AddHubMon()` configures the SDK
 2. `ServiceRegistrationHostedService` runs on startup
 3. The SDK auto-detects hostname, port, and URL
 4. Sends a `POST /api/services/register` request with service metadata

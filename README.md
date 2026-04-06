@@ -32,7 +32,7 @@ using ServiceMonitor.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_your_api_key_here";
@@ -55,7 +55,7 @@ That's it! Your service will automatically:
 Track HTTP requests per minute and active connections:
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_...";
@@ -72,7 +72,7 @@ app.Run();
 ## Configuration
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     // Required
     options.DashboardUrl = "https://api.hubmon.com";
@@ -111,7 +111,7 @@ builder.Services.AddServiceMonitor(options =>
 ```
 
 ```csharp
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     builder.Configuration.GetSection("HubMon").Bind(options);
 });
@@ -143,7 +143,7 @@ using ServiceMonitor.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddServiceMonitor(options =>
+builder.Services.AddHubMon(options =>
 {
     options.DashboardUrl = "https://api.hubmon.com";
     options.ApiKey = "sm_live_...";
